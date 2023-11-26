@@ -1,6 +1,6 @@
 import { useLoaderData } from 'react-router-dom';
 
-import { getPosts } from '../util/api';
+import { getSlowPosts } from '../util/api';
 
 import Posts from '../components/Posts';
 
@@ -17,5 +17,5 @@ function BlogPostsPage() {
 export default BlogPostsPage;
 
 export function loader() {
-  return getPosts();
+  return getSlowPosts();
 }

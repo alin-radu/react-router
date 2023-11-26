@@ -1,22 +1,23 @@
 import { useLoaderData } from 'react-router-dom';
 
+import BlogPost from '../components/BlogPost';
+import NewsletterSignup from '../components/NewsletterSignup';
 import { getPost } from '../util/api';
 
-import BlogPost from '../components/BlogPost';
-
 function PostDetailPage() {
-  const loaderData = useLoaderData();
-  console.log('%c-> developmentConsole: loaderData= ', 'color:#77dcfd', loaderData);
+  const postData = useLoaderData();
 
-  return <BlogPost title={loaderData.title} text={loaderData.body} />;
+  return (
+    <>
+      <BlogPost title={postData.title} text={postData.body} />
+      <NewsletterSignup />
+    </>
+  );
 }
 
 export default PostDetailPage;
 
-export function loader({ request, params }) {
-  console.log('%c-> developmentConsole: request= ', 'color:#77dcfd', request);
-  console.log('%c-> developmentConsole: params= ', 'color:#77dcfd', params);
-
+export function loader({ params }) {
   const postId = params.id;
 
   return getPost(postId);
