@@ -10,7 +10,7 @@
 
 ### II. GITHUB
 
-- git@github.com:alin-radu/react-practice-advanced.git
+- git@github.com:alin-radu/react-router.git
 
 ### III. APP
 
