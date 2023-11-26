@@ -1,39 +1,23 @@
-import { useState, useEffect } from 'react';
-import { useParams } from 'react-router-dom';
+import { useLoaderData } from 'react-router-dom';
 
-import BlogPost from '../components/BlogPost';
 import { getPost } from '../util/api';
 
+import BlogPost from '../components/BlogPost';
+
 function PostDetailPage() {
-  const [error, setError] = useState();
-  const [post, setPost] = useState();
-  const [isLoading, setIsLoading] = useState(false);
+  const loaderData = useLoaderData();
+  console.log('%c-> developmentConsole: loaderData= ', 'color:#77dcfd', loaderData);
 
-  const params = useParams();
-  const { id } = params;
-
-  useEffect(() => {
-    async function loadPost() {
-      setIsLoading(true);
-      try {
-        const post = await getPost(id);
-        setPost(post);
-      } catch (err) {
-        setError(err.message);
-      }
-      setIsLoading(false);
-    }
-
-    loadPost();
-  }, [id]);
-
-  return (
-    <>
-      {isLoading && <p>Loading post...</p>}
-      {error && <p>{error.message}</p>}
-      {!error && post && <BlogPost title={post.title} text={post.body} />}
-    </>
-  );
+  return <BlogPost title={loaderData.title} text={loaderData.body} />;
 }
 
 export default PostDetailPage;
+
+export function loader({ request, params }) {
+  console.log('%c-> developmentConsole: request= ', 'color:#77dcfd', request);
+  console.log('%c-> developmentConsole: params= ', 'color:#77dcfd', params);
+
+  const postId = params.id;
+
+  return getPost(postId);
+}

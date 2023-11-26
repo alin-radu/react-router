@@ -1,30 +1,17 @@
-import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { redirect, useActionData, useNavigate, useNavigation } from 'react-router-dom';
 
-import NewPostForm from '../components/NewPostForm';
 import { savePost } from '../util/api';
 
-function NewPostPage() {
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [error, setError] = useState();
-  const navigate = useNavigate();
+import NewPostForm from '../components/NewPostForm';
 
-  async function submitHandler(event) {
-    event.preventDefault();
-    setIsSubmitting(true);
-    try {
-      const formData = new FormData(event.target);
-      const post = {
-        title: formData.get('title'),
-        body: formData.get('post-text'),
-      };
-      await savePost(post);
-      navigate('/');
-    } catch (err) {
-      setError(err);
-    }
-    setIsSubmitting(false);
-  }
+function NewPostPage() {
+  const dataAction = useActionData();
+  const navigate = useNavigate();
+  // Note: navigation.state:"idle" || "loading" || "submitting"
+  const navigation = useNavigation();
+
+  console.log('%c-> developmentConsole: dataAction= ', 'color:#77dcfd', dataAction);
+  console.log('%c-> developmentConsole: navigation= ', 'color:#77dcfd', navigation);
 
   function cancelHandler() {
     navigate('/blog');
@@ -32,14 +19,36 @@ function NewPostPage() {
 
   return (
     <>
-      {error && <p>{error.message}</p>}
+      {dataAction && dataAction.status && <p>{dataAction.message}</p>}
       <NewPostForm
         onCancel={cancelHandler}
-        onSubmit={submitHandler}
-        submitting={isSubmitting}
+        submitting={navigation.state === 'submitting'}
       />
     </>
   );
 }
 
 export default NewPostPage;
+
+export async function action({ request, params }) {
+  console.log('%c-> developmentConsole: request= ', 'color:#77dcfd', request);
+  console.log('%c-> developmentConsole: params= ', 'color:#77dcfd', params);
+
+  const formData = await request.formData();
+
+  const post = {
+    title: formData.get('title'),
+    body: formData.get('post-text'),
+  };
+
+  try {
+    await savePost(post);
+  } catch (err) {
+    if (err.status === 422) {
+      return err;
+    }
+    throw err;
+  }
+
+  return redirect('/blog');
+}
